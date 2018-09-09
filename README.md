@@ -23,6 +23,13 @@ Good / Bad / Ugly Code:
 
 TODO: provide examples of code you wrote from this project that you think is good (elegant, simple, useful), bad (hack-y, brittle, unreadable), and ugly (particularly inelegant). Provide a sentence or two of justification for the examples.
 
+TODO: Credit for sound effects: (using Attribution 3.0)
+[Dragon Fire Breath and Roar](http://soundbible.com/tags-monster.html)
+[Scary](http://soundbible.com/1814-Scary.html)
+[Cave Ambience](https://freesound.org/people/IanStarGem/sounds/269595/) Put in the comment if I use it!
+[Atmosphere Cave](https://freesound.org/people/julius_galla/sounds/232685/)
+
+
 # Using This Base Code
 
 Before you dive into the code, it helps to understand the overall structure of this repository.

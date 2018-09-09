@@ -48,8 +48,8 @@ struct CratesMode : public Mode {
 	Scene::Object *large_crate = nullptr;
 	Scene::Object *small_crate = nullptr;
 
-	//when this reaches zero, the 'dot' sample is triggered at the small crate:
-	float dot_countdown = 1.0f;
+	//when this reaches zero, the 'roar' sample is triggered at the small crate:
+	float roar_countdown = 8.0f;
 
 	//this 'loop' sample is played at the large crate:
 	std::shared_ptr< Sound::PlayingSample > loop;

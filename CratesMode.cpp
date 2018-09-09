@@ -27,11 +27,15 @@ Load< GLuint > crates_meshes_for_vertex_color_program(LoadTagDefault, [](){
 	return new GLuint(crates_meshes->make_vao_for_program(vertex_color_program->program));
 });
 
-Load< Sound::Sample > sample_dot(LoadTagDefault, [](){
-	return new Sound::Sample(data_path("dot.wav"));
+Load< Sound::Sample > sample_roar(LoadTagDefault, [](){
+	return new Sound::Sample(data_path("european_dragon_roaring_and_breathe_fire.wav"));
 });
 Load< Sound::Sample > sample_loop(LoadTagDefault, [](){
-	return new Sound::Sample(data_path("loop.wav"));
+	//return new Sound::Sample(data_path("cave_ambience.wav"));  //shorter ambience music
+	return new Sound::Sample(data_path("atmosphere_cave_loop.wav"));  //longer ambience music
+});
+Load< Sound::Sample > sample_scary(LoadTagDefault, [](){
+	return new Sound::Sample(data_path("scary.wav"));
 });
 
 CratesMode::CratesMode() {
@@ -72,9 +76,12 @@ CratesMode::CratesMode() {
 		transform->rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		camera = scene.new_camera(transform);
 	}
-	
+
 	//start the 'loop' sample playing at the large crate:
-	loop = sample_loop->play(large_crate->transform->position, 1.0f, Sound::Loop);
+    //                      (position, volumn, Loop or Once)
+	loop = sample_loop->play(large_crate->transform->position, 4.0f, Sound::Loop);
+    //play 'scary' once at the beginning
+    sample_scary->play(camera->transform->position, 0.3f);
 }
 
 CratesMode::~CratesMode() {
@@ -156,11 +163,11 @@ void CratesMode::update(float elapsed) {
 		}
 	}
 
-	dot_countdown -= elapsed;
-	if (dot_countdown <= 0.0f) {
-		dot_countdown = (rand() / float(RAND_MAX) * 2.0f) + 0.5f;
-		glm::mat4x3 small_crate_to_world = small_crate->transform->make_local_to_world();
-		sample_dot->play( small_crate_to_world * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) );
+	roar_countdown -= elapsed;
+	if (roar_countdown <= 0.0f) {
+		roar_countdown = (rand() / float(RAND_MAX) * 8.0f) + 0.5f;  //Reset the countdown
+        glm::mat4x3 small_crate_to_world = small_crate->transform->make_local_to_world();
+        sample_roar->play( small_crate_to_world * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), 0.5f );
 	}
 }
 
