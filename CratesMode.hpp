@@ -47,6 +47,8 @@ struct CratesMode : public Mode {
 
 	Scene::Object *large_crate = nullptr;
 	Scene::Object *small_crate = nullptr;
+    Scene::Object *cage_wall = nullptr;
+    Scene::Object *cage_floor = nullptr;
 
 	//when this reaches zero, the 'roar' sample is triggered at the small crate:
 	float roar_countdown = 8.0f;

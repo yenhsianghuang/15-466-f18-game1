@@ -63,10 +63,17 @@ CratesMode::CratesMode() {
 		large_crate = attach_object(transform1, "Crate");
 		//smaller crate on top:
 		Scene::Transform *transform2 = scene.new_transform();
-		transform2->set_parent(transform1);
+        transform2->set_parent(transform1);
 		transform2->position = glm::vec3(0.0f, 0.0f, 1.5f);
 		transform2->scale = glm::vec3(0.5f);
 		small_crate = attach_object(transform2, "Crate");
+        //Try to add a piece of cage wall and floor
+		Scene::Transform *transform3 = scene.new_transform();
+        transform3->position = glm::vec3(5.0f, 5.0f, 5.0f);
+		cage_wall = attach_object(transform3, "CageWall");
+		Scene::Transform *transform4 = scene.new_transform();
+        transform3->position = glm::vec3(5.0f, 5.0f, 5.0f);
+		cage_floor = attach_object(transform4, "CageFloor");
 	}
 
 	{ //Camera looking at the origin:
@@ -130,13 +137,16 @@ bool CratesMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 			//Note: float(window_size.y) * camera->fovy is a pixels-to-radians conversion factor
 			float yaw = evt.motion.xrel / float(window_size.y) * camera->fovy;
 			float pitch = evt.motion.yrel / float(window_size.y) * camera->fovy;
-			yaw = -yaw;
-			pitch = -pitch;
-			camera->transform->rotation = glm::normalize(
-				camera->transform->rotation
-				* glm::angleAxis(yaw, glm::vec3(0.0f, 1.0f, 0.0f))
-				* glm::angleAxis(pitch, glm::vec3(1.0f, 0.0f, 0.0f))
-			);
+            //update total rotation of the camera
+            camera->azimuth -= yaw;
+			camera->elevation -= pitch;
+            //always re-compute the rotation of the camera from its original rotation
+            camera->transform->rotation = glm::normalize(
+                glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
+                * glm::angleAxis(camera->azimuth, glm::vec3(0.0f, 1.0f, 0.0f))
+                * glm::angleAxis(camera->elevation, glm::vec3(1.0f, 0.0f, 0.0f))
+            );
+
 			return true;
 		}
 	}

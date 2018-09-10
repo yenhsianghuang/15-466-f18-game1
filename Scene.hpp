@@ -82,6 +82,7 @@ struct Scene {
 
 	//"Camera"s contain information needed to view a scene:
 	struct Camera {
+        float azimuth = 0.0, elevation = 0.0;
 		Transform *transform; //cameras must be attached to transforms.
 		Camera(Transform *transform_) : transform(transform_) {
 			assert(transform);
