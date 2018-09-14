@@ -51,18 +51,18 @@ lamp_data = b""
 
 #write_string will add a string to the strings section and return a packed (begin,end) reference:
 def write_string(string):
-	global strings_data
+	global strings_data  #add "global" specifier when using global variable in a function
 	begin = len(strings_data)
 	strings_data += bytes(string, 'utf8')
 	end = len(strings_data)
 	return struct.pack('II', begin, end)
 
-obj_to_xfh = dict()
+obj_to_xfh = dict()  #obj to hierarchy(?)
 
 #write_xfh will add an object [and its parents] to the hierarchy section and return a packed (idx) reference:
 def write_xfh(obj):
 	global xfh_data
-	if obj in obj_to_xfh: return obj_to_xfh[obj]
+	if obj in obj_to_xfh: return obj_to_xfh[obj]  #done before, simply look up for previous results
 	if obj.parent == None:
 		parent_ref = struct.pack('i', -1)
 		world_to_parent = mathutils.Matrix()
@@ -113,9 +113,9 @@ def write_camera(obj):
 		camera_data += struct.pack('f', obj.data.ortho_scale)
 	else:
 		assert(False and "Unsupported camera type '" + obj.data.type + "'")
-	
+
 	camera_data += struct.pack('ff', obj.data.clip_start, obj.data.clip_end)
-		
+
 #write_lamp will add an object to the lamp section:
 def write_lamp(obj):
 	global lamp_data
@@ -146,7 +146,7 @@ def write_lamp(obj):
 		lamp_data += struct.pack('f', fov)
 	else:
 		lamp_data += struct.pack('f', 0.0)
-	
+
 
 for obj in bpy.data.objects:
 	if obj.layers[layer-1] == False: continue;

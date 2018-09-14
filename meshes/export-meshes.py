@@ -31,7 +31,7 @@ print("Will export meshes referenced from layer " + str(layer) + " of '" + infil
 class FileType:
 	def __init__(self, magic, as_lines = False):
 		self.magic = magic
-		self.position = (b"p" in magic)
+		self.position = (b"p" in magic)  #self.position = True if b"p" is in magic
 		self.normal = (b"n" in magic)
 		self.color = (b"c" in magic)
 		self.texcoord = (b"t" in magic)
@@ -42,6 +42,7 @@ class FileType:
 		if self.color: self.vertex_bytes += 4
 		if self.texcoord: self.vertex_bytes += 2 * 4
 
+#dict = { Key : Value, Key : Value }
 filetypes = {
 	".p" : FileType(b"p..."),
 	".pl" : FileType(b"p...", True),
@@ -54,9 +55,10 @@ filetypes = {
 	".pnct" : FileType(b"pnct"),
 }
 
+#check outfile's filetype (.pnc in our case)
 filetype = None
 for kv in filetypes.items():
-	if outfile.endswith(kv[0]):
+	if outfile.endswith(kv[0]):  #whether outfile ends with "kv[0]" (a specific filetype)
 		assert(filetype == None)
 		filetype = kv[1]
 
@@ -75,7 +77,7 @@ import argparse
 bpy.ops.wm.open_mainfile(filepath=infile)
 
 #meshes to write:
-to_write = set()
+to_write = set()  #create an empty set of mesh
 for obj in bpy.data.objects:
 	if obj.layers[layer-1] and obj.type == 'MESH':
 		to_write.add(obj.data)
@@ -93,7 +95,7 @@ vertex_count = 0
 for obj in bpy.data.objects:
 	if obj.data in to_write:
 		to_write.remove(obj.data)
-	else:
+	else:  #skip if obj.data does not in to_write
 		continue
 
 	mesh = obj.data
@@ -124,10 +126,10 @@ for obj in bpy.data.objects:
 		mesh.calc_normals_split()
 
 	#record mesh name, start position and vertex count in the index:
-	name_begin = len(strings)
-	strings += bytes(name, "utf8")
-	name_end = len(strings)
-	index += struct.pack('I', name_begin)
+	name_begin = len(strings)  #name_begin is the end of strings (concatenation of all names)
+	strings += bytes(name, "utf8")  #add new name
+	name_end = len(strings)  #name_end is the end of strings after a new name is added
+	index += struct.pack('I', name_begin)  #pack name_begin and name_end
 	index += struct.pack('I', name_end)
 
 	index += struct.pack('I', vertex_count) #vertex_begin
@@ -155,7 +157,7 @@ for obj in bpy.data.objects:
 				assert(mesh.loops[poly.loop_indices[i]].vertex_index == poly.vertices[i])
 				loop = mesh.loops[poly.loop_indices[i]]
 				vertex = mesh.vertices[loop.vertex_index]
-				for x in vertex.co:
+				for x in vertex.co:  #write vertex coordinates
 					data += struct.pack('f', x)
 				if filetype.normal:
 					for x in loop.normal:
@@ -172,7 +174,7 @@ for obj in bpy.data.objects:
 						data += struct.pack('ff', uv.x, uv.y)
 					else:
 						data += struct.pack('ff', 0, 0)
-		vertex_count += len(mesh.polygons) * 3
+		vertex_count += len(mesh.polygons) * 3  #3 vertices for each polygon
 	else:
 		#write the mesh edges:
 		for edge in mesh.edges:
