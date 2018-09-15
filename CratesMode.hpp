@@ -3,6 +3,7 @@
 #include "Mode.hpp"
 
 #include "MeshBuffer.hpp"
+#include "WalkMesh.hpp"
 #include "GL.hpp"
 #include "Scene.hpp"
 #include "Sound.hpp"
@@ -45,14 +46,16 @@ struct CratesMode : public Mode {
 	Scene scene;
 	Scene::Camera *camera = nullptr;
 
-	Scene::Object *large_crate = nullptr;
-	Scene::Object *small_crate = nullptr;
-    Scene::Object *cage_wall = nullptr;
     Scene::Object *cage_floor = nullptr;
+    Scene::Object *test_walk_mesh = nullptr;
+    Scene::Object *monster = nullptr;
+
+    WalkMesh::WalkPoint walk_point;
+    glm::vec3 camera_up, camera_at;
 
 	//when this reaches zero, the 'roar' sample is triggered at the small crate:
 	float roar_countdown = 8.0f;
 
-	//this 'loop' sample is played at the large crate:
+	//this 'loop' sample is played at the monster:
 	std::shared_ptr< Sound::PlayingSample > loop;
 };

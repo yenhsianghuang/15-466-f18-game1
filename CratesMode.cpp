@@ -19,13 +19,19 @@
 #include <cstddef>
 #include <random>
 
+//Ref from MeshBuffer
+Load< WalkMesh > walk_mesh(LoadTagDefault, []() {
+    return new WalkMesh(data_path("walkmesh.blob"));
+});
+
 Load< MeshBuffer > crates_meshes(LoadTagDefault, [](){
-	return new MeshBuffer(data_path("crates.pnc"));
+	return new MeshBuffer(data_path("maze.pnc"));
 });
 
 Load< GLuint > crates_meshes_for_vertex_color_program(LoadTagDefault, [](){
 	return new GLuint(crates_meshes->make_vao_for_program(vertex_color_program->program));
 });
+
 
 Load< Sound::Sample > sample_roar(LoadTagDefault, [](){
 	return new Sound::Sample(data_path("european_dragon_roaring_and_breathe_fire.wav"));
@@ -38,10 +44,41 @@ Load< Sound::Sample > sample_scary(LoadTagDefault, [](){
 	return new Sound::Sample(data_path("scary.wav"));
 });
 
+
 CratesMode::CratesMode() {
 	//----------------
 	//set up scene:
 	//TODO: this should load the scene from a file!
+
+    //Referenced from MeshBuffer.cpp
+	std::ifstream file(data_path("maze.scene"), std::ios::binary);
+    //str0 len < char > * [strings chunk]
+    //xfh0 len < ... > * [transform hierarchy]
+    //msh0 len < uint uint uint > [hierarchy point + mesh name]
+    //cam0 len < uint params > [heirarchy point + camera params]
+    //lig0 len < uint params > [hierarchy point + light params]
+    struct TransformEntry {
+        int32_t parent_ref;
+        uint32_t obj_name_begin, obj_name_end;
+        glm::vec3 position;
+        glm::vec4 rotation;
+        glm::vec3 scale;
+    };
+
+    struct MeshesEntry {
+        int32_t mesh_ref;
+        uint32_t mesh_name_begin, mesh_name_end;
+    };
+
+    std::vector< char > strings;
+    std::vector< TransformEntry > transforms;
+    std::vector< MeshesEntry > meshes;
+
+    read_chunk(file, "str0", &strings);
+    read_chunk(file, "xfh0", &transforms);
+    read_chunk(file, "msh0", &meshes);
+    //read_chunk(file, "cam0", &camera);  //might need to change variable name
+    //read_chunk(file, "lig0", &light);
 
 	auto attach_object = [this](Scene::Transform *transform, std::string const &name) {
 		Scene::Object *object = scene.new_object(transform);
@@ -56,37 +93,44 @@ CratesMode::CratesMode() {
 		return object;
 	};
 
-	{ //build some sort of content:
-		//Crate at the origin:
-		Scene::Transform *transform1 = scene.new_transform();
-		transform1->position = glm::vec3(1.0f, 0.0f, 0.0f);
-		large_crate = attach_object(transform1, "Crate");
-		//smaller crate on top:
-		Scene::Transform *transform2 = scene.new_transform();
-        transform2->set_parent(transform1);
-		transform2->position = glm::vec3(0.0f, 0.0f, 1.5f);
-		transform2->scale = glm::vec3(0.5f);
-		small_crate = attach_object(transform2, "Crate");
-        //Try to add a piece of cage wall and floor
-		Scene::Transform *transform3 = scene.new_transform();
-        transform3->position = glm::vec3(5.0f, 5.0f, 5.0f);
-		cage_wall = attach_object(transform3, "CageWall");
-		Scene::Transform *transform4 = scene.new_transform();
-        transform3->position = glm::vec3(5.0f, 5.0f, 5.0f);
-		cage_floor = attach_object(transform4, "CageFloor");
+
+	{ //build scene from maze.scene
+        for (auto& t : transforms) {
+            Scene::Transform *trans = scene.new_transform();
+            trans->position = t.position;
+            trans->rotation = glm::quat(t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+            trans->scale = t.scale;
+            std::string name(&strings[0] + t.obj_name_begin, &strings[0] + t.obj_name_end);
+            if (name == "CageFloor") {
+                cage_floor = attach_object(trans, "CageFloor");
+            } else if (name == "WalkMesh.001") {
+                test_walk_mesh = attach_object(trans, "WalkMesh.001");
+            } else if (name == "Monster") {
+                monster = attach_object(trans, "Monster");
+            } else if (name == "Player") {
+                camera = scene.new_camera(trans);
+                camera->transform->rotation = camera->original_rotation;
+            }
+        }
 	}
 
-	{ //Camera looking at the origin:
-		Scene::Transform *transform = scene.new_transform();
-		transform->position = glm::vec3(0.0f, -10.0f, 1.0f);
-		//Cameras look along -z, so rotate view to look at origin:
-		transform->rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		camera = scene.new_camera(transform);
-	}
+    walk_point = walk_mesh->start(camera->transform->position);  //do I need make_local_to_world()?
+    auto c = camera->transform->position;
+    std::cout << c[0] << " " << c[1] << " " << c[2] << std::endl;
+    auto p =
+        walk_mesh->vertices[walk_point.triangle[0]] * walk_point.weights[0] +
+        walk_mesh->vertices[walk_point.triangle[1]] * walk_point.weights[1] +
+        walk_mesh->vertices[walk_point.triangle[2]] * walk_point.weights[2];
+    std::cout << p[0] << " " << p[1] << " " << p[2] << std::endl;
+
+    //camera->elevation can be used to modify camera_up
+    //camera_up = walk_mesh->world_normal(walk_point);
+
+
 
 	//start the 'loop' sample playing at the large crate:
     //                      (position, volumn, Loop or Once)
-	loop = sample_loop->play(large_crate->transform->position, 4.0f, Sound::Loop);
+	loop = sample_loop->play(camera->transform->position, 0.5f, Sound::Loop);
     //play 'scary' once at the beginning
     sample_scary->play(camera->transform->position, 0.3f);
 }
@@ -136,17 +180,16 @@ bool CratesMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 		if (evt.type == SDL_MOUSEMOTION) {
 			//Note: float(window_size.y) * camera->fovy is a pixels-to-radians conversion factor
 			float yaw = evt.motion.xrel / float(window_size.y) * camera->fovy;
-			float pitch = evt.motion.yrel / float(window_size.y) * camera->fovy;
+			//float pitch = evt.motion.yrel / float(window_size.y) * camera->fovy;
             //update total rotation of the camera
             camera->azimuth -= yaw;
-			camera->elevation -= pitch;
+			//camera->elevation -= pitch;
             //always re-compute the rotation of the camera from its original rotation
             camera->transform->rotation = glm::normalize(
-                glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
+                camera->original_rotation
                 * glm::angleAxis(camera->azimuth, glm::vec3(0.0f, 1.0f, 0.0f))
                 * glm::angleAxis(camera->elevation, glm::vec3(1.0f, 0.0f, 0.0f))
             );
-
 			return true;
 		}
 	}
@@ -168,16 +211,16 @@ void CratesMode::update(float elapsed) {
 		Sound::listener.set_right( glm::normalize(cam_to_world[0]) );
 
 		if (loop) {
-			glm::mat4 large_crate_to_world = large_crate->transform->make_local_to_world();
-			loop->set_position( large_crate_to_world * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) );
+			glm::mat4 camera_to_world = camera->transform->make_local_to_world();
+			loop->set_position( camera_to_world * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) );
 		}
 	}
 
 	roar_countdown -= elapsed;
 	if (roar_countdown <= 0.0f) {
 		roar_countdown = (rand() / float(RAND_MAX) * 8.0f) + 0.5f;  //Reset the countdown
-        glm::mat4x3 small_crate_to_world = small_crate->transform->make_local_to_world();
-        sample_roar->play( small_crate_to_world * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), 0.5f );
+        glm::mat4x3 monster_to_world = monster->transform->make_local_to_world();
+        sample_roar->play( monster_to_world * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), 0.5f );
 	}
 }
 
