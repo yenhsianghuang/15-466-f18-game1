@@ -12,21 +12,21 @@ Screen Shot:
 
 How To Play:
 
-Move mouse to turn your head. Use wasd to move around. Try your best to get out of this maze. Remember! Don't touch the roaring monster.
+ - Move mouse to turn your head. Use wasd to move around. Try your best to get out of this maze. Remember! Don't touch the roaring monster.
 
-NOTE: The player is stocked on the first triangle because WalkMesh::walk is not fully implemented. To enable walking, comment out line 197-204 and uncomment line 193-196 in ```CrateMode.cpp```.
+ - The player is stocked on the first triangle because WalkMesh::walk is not fully implemented. To enable walking, comment out line 197-204 and uncomment line 193-196 in ```CrateMode.cpp```.
 
 Changes From The Design Document:
 
-The original design was to escape from a cave; however, I changed it to a maze because a maze is much easier to draw in blender.
+ - The original design was to escape from a cave; however, I changed it to a maze because a maze is much easier to draw in blender.
 
-The invisible monster is now visible for debugging (represented by a white cone).
+ - The invisible monster is now visible for debugging (represented by a white cone).
 
 Good / Bad / Ugly Code:
 
-Good Code: The WalkMesh::start was good and neat. Computing the distance from a point to a triangle in 3D is difficult and tricky, though, I optimized is based on the assumption that there will definitely be one triangle under the starting position of my player.
+ - Good Code: The WalkMesh::start was good and neat. Computing the distance from a point to a triangle in 3D is difficult and tricky, though, I optimized is based on the assumption that there will definitely be one triangle under the starting position of my player.
 
-Bad/Ugly Code: The way I load maze.scene is pretty hard coded. I still cannot figure out a beautiful way to do that.
+ - Bad/Ugly Code: The way I load maze.scene is pretty hard coded. I still cannot figure out a beautiful way to do that.
 
 Credit for sound effects: (using Attribution 3.0)
 
