@@ -114,25 +114,18 @@ CratesMode::CratesMode() {
         }
 	}
 
-    walk_point = walk_mesh->start(camera->transform->position);  //do I need make_local_to_world()?
-    auto c = camera->transform->position;
-    std::cout << c[0] << " " << c[1] << " " << c[2] << std::endl;
-    auto p =
-        walk_mesh->vertices[walk_point.triangle[0]] * walk_point.weights[0] +
-        walk_mesh->vertices[walk_point.triangle[1]] * walk_point.weights[1] +
-        walk_mesh->vertices[walk_point.triangle[2]] * walk_point.weights[2];
-    std::cout << p[0] << " " << p[1] << " " << p[2] << std::endl;
-
-    //camera->elevation can be used to modify camera_up
-    //camera_up = walk_mesh->world_normal(walk_point);
-
-
-
 	//start the 'loop' sample playing at the large crate:
     //                      (position, volumn, Loop or Once)
 	loop = sample_loop->play(camera->transform->position, 0.5f, Sound::Loop);
     //play 'scary' once at the beginning
     sample_scary->play(camera->transform->position, 0.3f);
+
+
+    walk_point = walk_mesh->start(camera->transform->position);  //do I need make_local_to_world()?
+    camera->normal = walk_mesh->world_normal(walk_point);
+    camera->transform->position = walk_mesh->world_point(walk_point) + camera->height * camera->normal;
+    //camera->elevation can be used to modify camera_up
+    //camera_up = walk_mesh->world_normal(walk_point);
 }
 
 CratesMode::~CratesMode() {
@@ -199,10 +192,20 @@ bool CratesMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 void CratesMode::update(float elapsed) {
 	glm::mat3 directions = glm::mat3_cast(camera->transform->rotation);
 	float amt = 5.0f * elapsed;
+    /*
 	if (controls.right) camera->transform->position += amt * directions[0];
 	if (controls.left) camera->transform->position -= amt * directions[0];
 	if (controls.backward) camera->transform->position += amt * directions[2];
 	if (controls.forward) camera->transform->position -= amt * directions[2];
+    */
+	if (controls.right)    walk_mesh->walk(walk_point,  amt * directions[0]);
+	if (controls.left)     walk_mesh->walk(walk_point, -amt * directions[0]);
+	if (controls.backward) walk_mesh->walk(walk_point,  amt * directions[2]);
+	if (controls.forward)  walk_mesh->walk(walk_point, -amt * directions[2]);
+
+    //update camera normal and position
+    camera->normal = walk_mesh->world_normal(walk_point);
+    camera->transform->position = walk_mesh->world_point(walk_point) + camera->height * camera->normal;
 
 	{ //set sound positions:
 		glm::mat4 cam_to_world = camera->transform->make_local_to_world();

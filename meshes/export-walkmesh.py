@@ -55,32 +55,19 @@ for obj in bpy.data.objects:
         if obj.layers[layer-1] and obj.type == 'MESH' and obj.name == 'WalkMesh':
 
                 mesh = obj.data
-                name = mesh.name
+                print("Writing '" + mesh.name + "'...")
 
-                #select the object and make it the active object:
-                bpy.ops.object.select_all(action='DESELECT')
-                obj.select = True
-                bpy.context.scene.objects.active = obj
-
-                print("Writing '" + name + "'...")
-                if bpy.context.mode == 'EDIT':
-                        bpy.ops.object.mode_set(mode='OBJECT') #get out of edit mode (just in case)
-
-                #apply all modifiers (?):
-                bpy.ops.object.convert(target='MESH')
+                # This part was taught by Eric
+                for vtx in mesh.vertices:
+                    for x in vtx.co:
+                        vertex += struct.pack('f', x)
+                    for n in vtx.normal:
+                        normal += struct.pack('f', n)
 
                 for poly in mesh.polygons:
-                        assert(len(poly.loop_indices) == 3)
+                        assert(len(poly.vertices) == 3)
                         loop_indices += struct.pack('III', poly.vertices[0], poly.vertices[1], poly.vertices[2])
-                        for i in range(0, 3):
-                                assert(mesh.loops[poly.loop_indices[i]].vertex_index == poly.vertices[i])
-                                loop = mesh.loops[poly.loop_indices[i]]
-                                vtx = mesh.vertices[loop.vertex_index]
-                                for x in vtx.co:
-                                        vertex += struct.pack('f', x)
-                                for x in loop.normal:
-                                        normal += struct.pack('f', x)
-                vertex_count += len(mesh.polygons) * 3  #3 vertices for each polygon
+                vertex_count += len(mesh.vertices)  #3 vertices for each polygon
 
                 break
 

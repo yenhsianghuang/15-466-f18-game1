@@ -85,11 +85,14 @@ struct Scene {
         float azimuth = 0.0, elevation = 0.0;
         glm::quat original_rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
                                       * glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        float height = 1.0f;  //height from the ground
+        glm::vec3 normal;
 
 		Transform *transform; //cameras must be attached to transforms.
 		Camera(Transform *transform_) : transform(transform_) {
 			assert(transform);
 		}
+
 		//NOTE: cameras look along their -z axis
 
 		//camera parameters (perspective):

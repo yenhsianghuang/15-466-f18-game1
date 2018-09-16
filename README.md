@@ -1,11 +1,10 @@
 # Game Information
-(Note: fill in this portion with information about your game.)
 
-Title: (TODO: your game's title)
+Title: Listen...
 
-Author: (TODO: your name)
+Author: Yen-Hsiang Huang
 
-Design Document: [TODO: name of design document](TODO: link to design document)
+Design Document: [Now you hear me, Now you don't](http://graphics.cs.cmu.edu/courses/15-466-f18/game1-designs/suannc/)
 
 Screen Shot:
 
@@ -13,17 +12,18 @@ Screen Shot:
 
 How To Play:
 
-TODO: describe the controls and (if needed) goals/strategy.
+Move mouse to turn your head. Use wasd to move around. Try your best to get out of this maze. Remember! Don't touch the roaring monster.
 
 Changes From The Design Document:
 
-TODO: what did you need to add/remove/modify from the original design? Why?
+The original design was to escape from a cave; however, I changed it to a maze because a maze is much easier to draw in blender.
 
 Good / Bad / Ugly Code:
 
-TODO: provide examples of code you wrote from this project that you think is good (elegant, simple, useful), bad (hack-y, brittle, unreadable), and ugly (particularly inelegant). Provide a sentence or two of justification for the examples.
+Good Code: The WalkMesh::start was good and neat. Computing the distance from a point to a triangle in 3D is difficult and tricky, though, I optimized is based on the assumption that there will definitely be one triangle under the starting position of my player.
+Bad/Ugly Code: The way I load maze.scene is pretty hard coded. I still cannot figure out a beautiful way to do that.
 
-TODO: Credit for sound effects: (using Attribution 3.0)
+Credit for sound effects: (using Attribution 3.0)
 [Dragon Fire Breath and Roar](http://soundbible.com/tags-monster.html)
 [Scary](http://soundbible.com/1814-Scary.html)
 [Cave Ambience](https://freesound.org/people/IanStarGem/sounds/269595/) Put in the comment if I use it!
