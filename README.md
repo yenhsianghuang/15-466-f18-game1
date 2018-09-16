@@ -21,13 +21,16 @@ The original design was to escape from a cave; however, I changed it to a maze b
 Good / Bad / Ugly Code:
 
 Good Code: The WalkMesh::start was good and neat. Computing the distance from a point to a triangle in 3D is difficult and tricky, though, I optimized is based on the assumption that there will definitely be one triangle under the starting position of my player.
+
 Bad/Ugly Code: The way I load maze.scene is pretty hard coded. I still cannot figure out a beautiful way to do that.
 
 Credit for sound effects: (using Attribution 3.0)
-[Dragon Fire Breath and Roar](http://soundbible.com/tags-monster.html)
-[Scary](http://soundbible.com/1814-Scary.html)
-[Cave Ambience](https://freesound.org/people/IanStarGem/sounds/269595/) Put in the comment if I use it!
-[Atmosphere Cave](https://freesound.org/people/julius_galla/sounds/232685/)
+
+ - [Dragon Fire Breath and Roar](http://soundbible.com/tags-monster.html)
+
+ - [Scary](http://soundbible.com/1814-Scary.html)
+
+ - [Atmosphere Cave](https://freesound.org/people/julius_galla/sounds/232685/)
 
 
 # Using This Base Code
