@@ -47,7 +47,6 @@ struct CratesMode : public Mode {
 	Scene::Camera *camera = nullptr;
 
     Scene::Object *cage_floor = nullptr;
-    Scene::Object *test_walk_mesh = nullptr;
     Scene::Object *monster = nullptr;
 
     WalkMesh::WalkPoint walk_point;

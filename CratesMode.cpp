@@ -103,8 +103,6 @@ CratesMode::CratesMode() {
             std::string name(&strings[0] + t.obj_name_begin, &strings[0] + t.obj_name_end);
             if (name == "CageFloor") {
                 cage_floor = attach_object(trans, "CageFloor");
-            } else if (name == "WalkMesh.001") {
-                test_walk_mesh = attach_object(trans, "WalkMesh.001");
             } else if (name == "Monster") {
                 monster = attach_object(trans, "Monster");
             } else if (name == "Player") {
@@ -192,16 +190,14 @@ bool CratesMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 void CratesMode::update(float elapsed) {
 	glm::mat3 directions = glm::mat3_cast(camera->transform->rotation);
 	float amt = 5.0f * elapsed;
-    /*
-	if (controls.right) camera->transform->position += amt * directions[0];
-	if (controls.left) camera->transform->position -= amt * directions[0];
-	if (controls.backward) camera->transform->position += amt * directions[2];
-	if (controls.forward) camera->transform->position -= amt * directions[2];
-    */
-	if (controls.right)    walk_mesh->walk(walk_point,  amt * directions[0]);
-	if (controls.left)     walk_mesh->walk(walk_point, -amt * directions[0]);
-	if (controls.backward) walk_mesh->walk(walk_point,  amt * directions[2]);
-	if (controls.forward)  walk_mesh->walk(walk_point, -amt * directions[2]);
+    //if (controls.right) camera->transform->position += amt * directions[0];
+    //if (controls.left) camera->transform->position -= amt * directions[0];
+    //if (controls.backward) camera->transform->position += amt * directions[2];
+    //if (controls.forward) camera->transform->position -= amt * directions[2];
+    if (controls.right)    walk_mesh->walk(walk_point,  amt * directions[0]);
+    if (controls.left)     walk_mesh->walk(walk_point, -amt * directions[0]);
+    if (controls.backward) walk_mesh->walk(walk_point,  amt * directions[2]);
+    if (controls.forward)  walk_mesh->walk(walk_point, -amt * directions[2]);
 
     //update camera normal and position
     camera->normal = walk_mesh->world_normal(walk_point);

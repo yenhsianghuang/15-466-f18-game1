@@ -14,9 +14,13 @@ How To Play:
 
 Move mouse to turn your head. Use wasd to move around. Try your best to get out of this maze. Remember! Don't touch the roaring monster.
 
+NOTE: The player is stocked on the first triangle because WalkMesh::walk is not fully implemented. To enable walking, comment out line 197-204 and uncomment line 193-196 in ```CrateMode.cpp```.
+
 Changes From The Design Document:
 
 The original design was to escape from a cave; however, I changed it to a maze because a maze is much easier to draw in blender.
+
+The invisible monster is now visible for debugging (represented by a white cone).
 
 Good / Bad / Ugly Code:
 
