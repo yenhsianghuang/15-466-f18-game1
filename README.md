@@ -66,16 +66,22 @@ Before you dive into the code, it helps to understand the overall structure of t
 
 ## Asset Build Instructions
 
-In order to generate the ```dist/crates.pnc``` file, tell blender to execute the ```meshes/export-meshes.py``` script:
+In order to generate the ```dist/maze.pnc``` file, tell blender to execute the ```meshes/export-meshes.py``` script:
 
 ```
-blender --background --python meshes/export-meshes.py -- meshes/crates.blend dist/crates.pnc
+blender --background --python meshes/export-meshes.py -- meshes/maze.blend dist/maze.pnc
 ```
 
-In order to generate the ```dist/crates.scene``` file, tell blender to execute the ```meshes/export-scene.py``` script:
+In order to generate the ```dist/maze.scene``` file, tell blender to execute the ```meshes/export-scene.py``` script:
 
 ```
-blender --background --python meshes/export-scene.py -- meshes/crates.blend dist/crates.scene
+blender --background --python meshes/export-scene.py -- meshes/maze.blend dist/maze.scene
+```
+
+In order to generate the ```dist/walkmesh.blob``` file, tell blender to execute the ```meshes/export-walkmesh.py``` script:
+
+```
+blender --background --python meshes/export-walkmesh.py -- meshes/maze.blend dist/walkmesh.blob
 ```
 
 There is a Makefile in the ```meshes``` directory that will do this for you.
